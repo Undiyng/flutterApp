@@ -13,4 +13,6 @@ Router.post("/", (req, res) => {
       response.failure(req, res, error, 500);
     });
 });
+
+Router.get('/',()=>{return "hola mundo"})
 module.exports = Router;
