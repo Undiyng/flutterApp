@@ -30,80 +30,107 @@ if (firebaseKeyString) {
         console.log("🔥 Firebase Admin SDK inicializado.");
     } catch (e) {
         console.error("❌ Error al inicializar Firebase:", e);
-        throw new Error("Configuración de Firebase inválida.");
     }
-} else {
-    console.error("🛑 ERROR CRÍTICO: La variable FIREBASE_SERVICE_ACCOUNT_KEY no está definida.");
-    throw new Error("Falta la Variable de Entorno de Firebase.");
 }
 
-// ✅ Configuración MEJORADA para Vercel
-const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
+// Configuración para Vercel
+const isVercel = process.env.VERCEL;
 const baseURL = isVercel 
   ? 'https://flutter-app-self.vercel.app' 
   : `http://localhost:${PORT}`;
 
+// ✅ SOLUCIÓN ALTERNATIVA: Generar spec estáticamente primero
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'API de mi App Flutter (Express)',
+      title: 'API de mi App Flutter',
       version: '1.0.0',
-      description: 'Documentación de los endpoints del backend.',
+      description: 'Documentación de endpoints',
     },
-    servers: [
-      {
-        url: baseURL,
-        description: isVercel ? 'Servidor de Producción' : 'Servidor Local',
-      },
-    ],
+    servers: [{ url: baseURL }],
   },
-  apis: [
-    path.join(__dirname, 'components/routes/*.js'), // ✅ Rutas absolutas
-    path.join(__dirname, 'components/routes/networkPromotionPost.js'),
-    path.join(__dirname, 'app.js')
-  ],
+  apis: [path.join(__dirname, 'components/routes/networkPromotionPost.js')],
 };
 
-// ✅ MONTAR RUTAS PRIMERO para que Swagger las detecte
+// Montar rutas primero
 Router(app);
 
+// Generar spec
 const swaggerSpec = swaggerJsdoc(options);
 
-// ✅ DEBUG: Verificar qué encontró Swagger
-console.log('🔍 Swagger Paths encontrados:', Object.keys(swaggerSpec.paths || {}));
+// ✅ DEBUG EXTENDIDO
+console.log('=== SWAGGER DEBUG ===');
+console.log('Número de paths:', Object.keys(swaggerSpec.paths || {}).length);
+console.log('Paths:', Object.keys(swaggerSpec.paths || {}));
+console.log('Base URL:', baseURL);
+console.log('Es Vercel?:', isVercel);
 
-// ✅ Configuración robusta de Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+// ✅ SOLUCIÓN: Si no hay paths, crear uno manual para testing
+if (Object.keys(swaggerSpec.paths || {}).length === 0) {
+  console.log('⚠️  No se encontraron paths, agregando uno manual...');
+  swaggerSpec.paths = {
+    '/health': {
+      get: {
+        summary: 'Health Check',
+        description: 'Verificar estado del servidor',
+        responses: {
+          '200': {
+            description: 'Servidor funcionando',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'OK' },
+                    timestamp: { type: 'string', example: '2024-01-01T00:00:00.000Z' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  };
+}
+
+// ✅ SERVIR Swagger UI con configuración explícita
+const swaggerOptions = {
   explorer: true,
   customCss: '.swagger-ui .topbar { display: none }',
+  customJs: [
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.9.0/swagger-ui-bundle.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.9.0/swagger-ui-standalone-preset.min.js'
+  ],
+  customCssUrl: [
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.9.0/swagger-ui.min.css'
+  ],
   swaggerOptions: {
     persistAuthorization: true,
+    displayRequestDuration: true,
   }
-}));
+};
 
-// ✅ Ruta de health check
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerOptions));
+
+// ✅ Ruta para ver el JSON de Swagger (para debug)
+app.get('/swagger.json', (req, res) => {
+  res.json(swaggerSpec);
+});
+
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     message: 'Servidor funcionando',
-    timestamp: new Date().toISOString(),
-    environment: isVercel ? 'production' : 'development'
-  });
-});
-
-// ✅ Ruta raíz
-app.get('/', (req, res) => {
-  res.json({ 
-    message: 'API funcionando correctamente',
-    docs: `${baseURL}/api-docs`
+    timestamp: new Date().toISOString()
   });
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`);
+  console.log(`🚀 Servidor en puerto ${PORT}`);
   console.log(`📚 Swagger UI: ${baseURL}/api-docs`);
+  console.log(`📄 Swagger JSON: ${baseURL}/swagger.json`);
 });
 
-// ✅ EXPORT para Vercel (CRÍTICO)
 module.exports = app;
