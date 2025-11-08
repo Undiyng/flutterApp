@@ -60,10 +60,6 @@ const options = {
       description: 'Documentación de los endpoints del backend.',
     },
     servers: [
-       {
-        url: `http://localhost:${PORT}`, // URL LOCAL para desarrollo
-        description: 'Servidor Local de Desarrollo',
-      },
       {
         url: 'https://flutter-app-self.vercel.app/', // URL base de tu API
         description: 'Servidor Local de Desarrollo',
