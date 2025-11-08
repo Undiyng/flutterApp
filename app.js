@@ -1,8 +1,8 @@
 const express = require("express");
 var admin = require("firebase-admin");
-var serviceAccount = require("./llave.json");
+//var serviceAccount = require("./llave.json");
 //const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-//const firebaseKeyString = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+const firebaseKeyString = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const body_parser = require("body-parser");
@@ -28,9 +28,9 @@ app.use(body_parser.urlencoded({ extended: false }));
   credential: admin.credential.cert(serviceAccount)
 });
 */
-if (true) {
+if (firebaseKeyString) {
     try {
-       // const serviceAccount = JSON.parse(firebaseKeyString);
+        const serviceAccount = JSON.parse(firebaseKeyString);
         
         // Inicialización de Firebase SÓLO si el parseo fue exitoso
         admin.initializeApp({
