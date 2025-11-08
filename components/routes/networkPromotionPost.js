@@ -19,8 +19,6 @@ const response = require("../response/response");
  *             required:
  *               - title
  *               - body
- *               - start_date
- *               - end_date
  *             properties:
  *               title:
  *                 type: string
@@ -30,16 +28,6 @@ const response = require("../response/response");
  *                 type: string
  *                 description: Descripción detallada de la promoción
  *                 example: "Descuento del 20% en todos los productos de temporada"
- *               start_date:
- *                 type: string
- *                 format: date
- *                 description: Fecha de inicio de la promoción (YYYY-MM-DD)
- *                 example: "2024-06-01"
- *               end_date:
- *                 type: string
- *                 format: date
- *                 description: Fecha de fin de la promoción (YYYY-MM-DD)
- *                 example: "2024-06-30"
  *     responses:
  *       201:
  *         description: Promoción creada exitosamente
