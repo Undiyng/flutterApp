@@ -3,14 +3,14 @@ const admin = require('firebase-admin')
 
 async function addPromotion(promotionData){
 
-const {title,body,start_date,end_date} = promotionData
+const {title,body} = promotionData
 return new Promise( async(resolve,reject)=>{
     if(!title){
         console.error(`[promotionControllerError] data missing`);
         reject(`Parametros incorrectos`);
         return false
     }
-const newPromotion = new Promotion({title,body,start_date,end_date})
+const newPromotion = new Promotion({title,body})
     await newPromotion.save()
     
      const message = {
