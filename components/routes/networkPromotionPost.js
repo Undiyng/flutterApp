@@ -56,60 +56,12 @@ const response = require("../response/response");
  *                   example: "Promoción creada exitosamente"
  *                 data:
  *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                       example: "60d21b4667d0d8992e610c85"
- *                     title:
- *                       type: string
- *                       example: "Promoción de Verano 2024"
- *                     body:
- *                       type: string
- *                       example: "Descuento del 20% en todos los productos de temporada"
- *                     start_date:
- *                       type: string
- *                       example: "2024-06-01"
- *                     end_date:
- *                       type: string
- *                       example: "2024-06-30"
- *                     __v:
- *                       type: number
- *                       example: 0
  *       400:
  *         description: Error de validación
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: false
- *                 message:
- *                   type: string
- *                   example: "Todos los campos son requeridos"
- *                 error:
- *                   type: string
- *                   example: "Faltan campos requeridos: title, body"
  *       500:
  *         description: Error interno del servidor
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: false
- *                 message:
- *                   type: string
- *                   example: "Error interno del servidor"
- *                 error:
- *                   type: string
- *                   example: "Error al conectar con la base de datos"
  */
 Router.post("/", (req, res) => {
- 
   promotionController
     .addPromotion(req.body)
     .then((data) => {
@@ -118,11 +70,10 @@ Router.post("/", (req, res) => {
         message: "Promoción creada exitosamente",
         data: data
       };
-      // Usa response.success para enviar la respuesta envuelta
       response.success(req, res, responseData, 201);
     })
     .catch((error) => {
-       const errorResponse = {
+      const errorResponse = {
         success: false,
         message: "Error al crear la promoción",
         error: error.message
@@ -130,6 +81,5 @@ Router.post("/", (req, res) => {
       response.failure(req, res, errorResponse, 500);
     });
 });
-
 
 module.exports = Router;
