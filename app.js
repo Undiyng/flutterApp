@@ -54,6 +54,3 @@ app.listen(PORT, () => {
   console.log(`escuchando en el puerto ${PORT}`);
 });
 
-module.exports = {
-  admin
-}
